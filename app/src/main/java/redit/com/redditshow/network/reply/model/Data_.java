@@ -12,6 +12,9 @@ public class Data_ implements Parcelable {
 	@SerializedName("subreddit")
 	@Expose
 	public String subreddit;
+	@SerializedName("preview")
+	@Expose
+	public Preview preview;
 	@SerializedName("id")
 	@Expose
 	public String id;
@@ -118,6 +121,7 @@ public class Data_ implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.subreddit);
+		dest.writeParcelable(this.preview, flags);
 		dest.writeString(this.id);
 		dest.writeInt(this.score);
 		dest.writeString(this.author);
@@ -152,6 +156,7 @@ public class Data_ implements Parcelable {
 
 	protected Data_(Parcel in) {
 		this.subreddit = in.readString();
+		this.preview = in.readParcelable(Preview.class.getClassLoader());
 		this.id = in.readString();
 		this.score = in.readInt();
 		this.author = in.readString();
