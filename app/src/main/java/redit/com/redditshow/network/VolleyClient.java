@@ -15,7 +15,7 @@ import com.android.volley.toolbox.HurlStack;
 import android.content.Context;
 import android.os.Build;
 
-import se.svt.svti.android.nyhetsapp.util.Constant;
+import redit.com.redditshow.util.Constant;
 
 public class VolleyClient {
 	public static final RetryPolicy NO_RETRY_POLICY = new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);

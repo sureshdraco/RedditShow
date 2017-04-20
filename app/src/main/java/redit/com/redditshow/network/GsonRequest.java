@@ -140,11 +140,7 @@ public class GsonRequest<T extends ReplyBase> extends Request<T> {
 			String json = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
 			if (Constant.DEBUG)
 				Log.d(TAG, "Response[" + "]: " + json);
-			if (json.contains("structuredBody")) {
-				json = json.replace("\"type\":\"text\",\"content\"", "\"type\":\"text\",\"textContent\"");
-			}
 			T result = gson.fromJson(json, this.response);
-			result.responseCode = response.statusCode;
 			if (shouldCacheResponse) {
 				return Response.success(result, getClientSideCacheHeaders(response));
 			} else {
