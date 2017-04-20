@@ -1,15 +1,11 @@
-package redit.com.redditshow;
+package redit.com.redditshow.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
-import net.dean.jraw.RedditClient;
-import net.dean.jraw.http.UserAgent;
-import net.dean.jraw.http.oauth.Credentials;
-import net.dean.jraw.http.oauth.OAuthData;
-
-import java.util.UUID;
+import redit.com.redditshow.R;
+import redit.com.redditshow.network.ApiServiceManager;
+import redit.com.redditshow.network.request.AllReditRequest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,5 +15,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+//		ApiServiceManager.getInstance().addRequest(new AllReditRequest())
 	}
 }
