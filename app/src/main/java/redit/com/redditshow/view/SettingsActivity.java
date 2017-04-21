@@ -14,7 +14,7 @@ public class SettingsActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_settings);
+		setContentView(R.layout.content_settings);
 		final EditText subreddits = (EditText) findViewById(R.id.subreddits);
 		subreddits.setText(PreferenceUtil.getSubreddit(getApplicationContext()));
 		subreddits.setSelection(subreddits.getText().length());

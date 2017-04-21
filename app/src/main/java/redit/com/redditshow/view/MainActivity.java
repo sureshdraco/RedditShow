@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import redit.com.redditshow.R;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 	private int listingSize;
 	private Runnable r;
 	private String subredditsStr;
+	private TextView status;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 		handler = new Handler();
 		mViewPager = (ViewPager) findViewById(R.id.container);
+		status = (TextView) findViewById(R.id.status);
 	}
 
 	private void fetchData() {
@@ -62,9 +65,11 @@ public class MainActivity extends AppCompatActivity {
 			public void onSuccessResponse(Listing response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
 				try {
+					status.setText("Success");
 					Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 					handleResponse(response);
 				} catch (Exception e) {
+					status.setText("Failed");
 					Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onErrorResponse(ReplyBase response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
+				status.setText("Failed");
 				Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
 			}
 		});
