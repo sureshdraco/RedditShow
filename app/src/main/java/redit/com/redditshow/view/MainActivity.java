@@ -1,14 +1,19 @@
 package redit.com.redditshow.view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +28,7 @@ import redit.com.redditshow.network.reply.ReplyBase;
 import redit.com.redditshow.network.reply.model.Child;
 import redit.com.redditshow.network.request.AllReditRequest;
 import redit.com.redditshow.util.Constant;
+import redit.com.redditshow.util.PreferenceUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,17 +45,24 @@ public class MainActivity extends AppCompatActivity {
 	 */
 	private ViewPager mViewPager;
 	private int listingSize;
+	private Runnable r;
+	private String subredditsStr;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main2);
+		setContentView(R.layout.activity_main);
 		handler = new Handler();
-		ApiServiceManager.getInstance().addRequest(new AllReditRequest(), Listing.class, new SuccessListener<Listing>() {
+		mViewPager = (ViewPager) findViewById(R.id.container);
+	}
+
+	private void fetchData() {
+		ApiServiceManager.getInstance().addRequest(new AllReditRequest(getSubreddits()), Listing.class, new SuccessListener<Listing>() {
 			@Override
 			public void onSuccessResponse(Listing response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
 				try {
+					Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 					handleResponse(response);
 				} catch (Exception e) {
 					Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
@@ -62,15 +75,42 @@ public class MainActivity extends AppCompatActivity {
 				Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
 			}
 		});
+	}
 
+	private List<String> getSubreddits() {
+		subredditsStr = PreferenceUtil.getSubreddit(getApplicationContext());
+		if (TextUtils.isEmpty(subredditsStr)) {
+			return new ArrayList<>();
+		}
+		String[] list = subredditsStr.split("\n");
+		return Arrays.asList(list);
 	}
 
 	private void handleResponse(Listing response) {
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), response.data.children);
-		mViewPager = (ViewPager) findViewById(R.id.container);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+			}
+
+			@Override
+			public void onPageSelected(int position) {
+				try {
+					handler.removeCallbacks(r);
+					handler.postDelayed(r, 5000);
+				} catch (Exception e) {
+				}
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+
+			}
+		});
 		listingSize = response.data.children.size();
-		Runnable r = new Runnable() {
+		r = new Runnable() {
 			@Override
 			public void run() {
 				int current = mViewPager.getCurrentItem();
@@ -83,6 +123,28 @@ public class MainActivity extends AppCompatActivity {
 			}
 		};
 		handler.postDelayed(r, 5000);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		try {
+			handler.removeCallbacks(r);
+		} catch (Exception e) {
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (TextUtils.equals(subredditsStr, PreferenceUtil.getSubreddit(getApplicationContext()))) {
+			try {
+				handler.postDelayed(r, 5000);
+			} catch (Exception e) {
+			}
+		} else {
+			fetchData();
+		}
 	}
 
 	@Override
@@ -101,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
 
 		// noinspection SimplifiableIfStatement
 		if (id == R.id.action_settings) {
-			return true;
+			startActivity(new Intent(this, SettingsActivity.class));
+			return false;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -110,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the sections/tabs/pages.
 	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
+	public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
 		private final List<Child> childList;
 

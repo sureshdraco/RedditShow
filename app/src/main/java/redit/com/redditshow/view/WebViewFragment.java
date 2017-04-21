@@ -24,13 +24,13 @@ import redit.com.redditshow.util.Constant;
 public class WebViewFragment extends Fragment {
 	private static final String ARG_DATA = "data";
 	private static final String TAG = WebViewFragment.class.getCanonicalName();
-	
+
 	private Child child;
-	
+
 	public WebViewFragment() {
 		// Required empty public constructor
 	}
-	
+
 	public static WebViewFragment newInstance(Child child) {
 		WebViewFragment fragment = new WebViewFragment();
 		Bundle args = new Bundle();
@@ -38,7 +38,7 @@ public class WebViewFragment extends Fragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,14 +46,14 @@ public class WebViewFragment extends Fragment {
 			child = getArguments().getParcelable(ARG_DATA);
 		}
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		return inflater.inflate(R.layout.fragment_web_view, container, false);
 	}
-	
+
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -69,7 +69,7 @@ public class WebViewFragment extends Fragment {
 				} catch (Exception e) {
 				}
 			}
-			
+
 			@Override
 			public void onPageFinished(WebView view, String url) {
 				super.onPageFinished(view, url);
@@ -81,14 +81,13 @@ public class WebViewFragment extends Fragment {
 		});
 		try {
 			webview.loadUrl(getUrl(child.getData()));
-			webview.setPadding(0, 0, 0, 0);
-			webview.setInitialScale(getScale(child.getData().preview.images.get(0).source.width));
-			webview.getSettings().setSupportZoom(true);
+			webview.getSettings().setLoadWithOverviewMode(true);
+			webview.getSettings().setUseWideViewPort(true);
 		} catch (Exception e) {
 			if (Constant.DEBUG) Log.d(TAG, e.toString());
 		}
 	}
-	
+
 	private int getScale(int picWidth) {
 		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 		int width = display.getWidth();
@@ -96,7 +95,7 @@ public class WebViewFragment extends Fragment {
 		val = val * 100d;
 		return val.intValue();
 	}
-	
+
 	private String getUrl(Data_ data) {
 		if (data == null) {
 			return "";
@@ -108,7 +107,7 @@ public class WebViewFragment extends Fragment {
 			} else {
 				return image.variants.gif.source.url;
 			}
-			
+
 		} catch (Exception e) {
 		}
 		return "";
