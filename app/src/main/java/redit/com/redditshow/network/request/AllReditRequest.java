@@ -39,7 +39,7 @@ public class AllReditRequest extends ReditRequest {
 
 	@Override
 	public String getBaseUrl() {
-		return "https://www.reddit.com/r/" + getSubreddits() + "/.json?limit=100";
+		return "https://www.reddit.com/r/" + getSubreddits() + "/.json?sort=new&limit=100";
 	}
 
 	@Override

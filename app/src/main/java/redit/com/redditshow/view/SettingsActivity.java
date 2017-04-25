@@ -2,7 +2,9 @@ package redit.com.redditshow.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,6 +26,14 @@ public class SettingsActivity extends AppCompatActivity {
 				PreferenceUtil.saveSubreddit(getApplicationContext(), subreddits.getText().toString());
 				Toast.makeText(SettingsActivity.this, "Saved", Toast.LENGTH_SHORT).show();
 				finish();
+			}
+		});
+		SwitchCompat autoScroll = (SwitchCompat) findViewById(R.id.autoScroll);
+		autoScroll.setChecked(PreferenceUtil.getAutoScroll(getApplicationContext()));
+		autoScroll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				PreferenceUtil.saveAutoScroll(getApplicationContext(), isChecked);
 			}
 		});
 	}

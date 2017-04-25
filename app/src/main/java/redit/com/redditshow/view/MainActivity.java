@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
 import redit.com.redditshow.R;
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 	private int listingSize;
 	private Runnable r;
 	private String subredditsStr;
-	private TextView status;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,12 @@ public class MainActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_main);
 		handler = new Handler();
 		mViewPager = (ViewPager) findViewById(R.id.container);
-		status = (TextView) findViewById(R.id.status);
+		findViewById(R.id.settings).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+			}
+		});
 	}
 
 	private void fetchData() {
@@ -65,11 +69,9 @@ public class MainActivity extends AppCompatActivity {
 			public void onSuccessResponse(Listing response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
 				try {
-					status.setText("Success");
 					Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 					handleResponse(response);
 				} catch (Exception e) {
-					status.setText("Failed");
 					Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -77,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onErrorResponse(ReplyBase response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
-				status.setText("Failed");
 				Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
 			}
 		});
@@ -103,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public void onPageSelected(int position) {
+				if (!PreferenceUtil.getAutoScroll(getApplicationContext())) {
+					return;
+				}
 				try {
 					handler.removeCallbacks(r);
 					handler.postDelayed(r, 5000);
@@ -128,6 +132,9 @@ public class MainActivity extends AppCompatActivity {
 				handler.postDelayed(this, 5000);
 			}
 		};
+		if (!PreferenceUtil.getAutoScroll(getApplicationContext())) {
+			return;
+		}
 		handler.postDelayed(r, 5000);
 	}
 
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (TextUtils.equals(subredditsStr, PreferenceUtil.getSubreddit(getApplicationContext()))) {
+		if (PreferenceUtil.getAutoScroll(getApplicationContext()) && TextUtils.equals(subredditsStr, PreferenceUtil.getSubreddit(getApplicationContext()))) {
 			try {
 				handler.postDelayed(r, 5000);
 			} catch (Exception e) {
@@ -151,29 +158,6 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			fetchData();
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.menu_main2, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-
-		// noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			startActivity(new Intent(this, SettingsActivity.class));
-			return false;
-		}
-
-		return super.onOptionsItemSelected(item);
 	}
 
 	/**
