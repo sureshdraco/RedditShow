@@ -15,8 +15,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -61,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 			}
 		});
+		fetchData();
 	}
 
 	private void fetchData() {
@@ -69,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
 			public void onSuccessResponse(Listing response) {
 				if (Constant.DEBUG) Log.d(TAG, response.toString());
 				try {
-					Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 					handleResponse(response);
 				} catch (Exception e) {
 					Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
@@ -155,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
 				handler.postDelayed(r, 5000);
 			} catch (Exception e) {
 			}
-		} else {
+		}
+		if (!TextUtils.equals(subredditsStr, PreferenceUtil.getSubreddit(getApplicationContext()))) {
 			fetchData();
 		}
 	}
