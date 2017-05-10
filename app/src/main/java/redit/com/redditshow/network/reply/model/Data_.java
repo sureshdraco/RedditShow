@@ -102,6 +102,9 @@ public class Data_ implements Parcelable {
 	@SerializedName("subreddit_type")
 	@Expose
 	public String subredditType;
+	@SerializedName("media_embed")
+	@Expose
+	public MediaEmbed mediaEmbed;
 	@SerializedName("ups")
 	@Expose
 	public int ups;
@@ -151,6 +154,7 @@ public class Data_ implements Parcelable {
 		dest.writeInt(this.numComments);
 		dest.writeByte(this.visited ? (byte) 1 : (byte) 0);
 		dest.writeString(this.subredditType);
+		dest.writeParcelable(this.mediaEmbed, flags);
 		dest.writeInt(this.ups);
 	}
 
@@ -186,6 +190,7 @@ public class Data_ implements Parcelable {
 		this.numComments = in.readInt();
 		this.visited = in.readByte() != 0;
 		this.subredditType = in.readString();
+		this.mediaEmbed = in.readParcelable(MediaEmbed.class.getClassLoader());
 		this.ups = in.readInt();
 	}
 

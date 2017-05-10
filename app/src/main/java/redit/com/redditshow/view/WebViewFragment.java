@@ -1,16 +1,16 @@
 package redit.com.redditshow.view;
 
-import android.content.Context;
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
@@ -79,21 +79,24 @@ public class WebViewFragment extends Fragment {
 				}
 			}
 		});
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.getSettings().setUseWideViewPort(true);
+		webview.getSettings().setJavaScriptEnabled(true);
 		try {
-			webview.loadUrl(getUrl(child.getData()));
-			webview.getSettings().setLoadWithOverviewMode(true);
-			webview.getSettings().setUseWideViewPort(true);
+			if (TextUtils.isEmpty(getContent(child.getData()))) {
+				try {
+					webview.loadUrl(getUrl(child.getData()));
+				} catch (Exception e1) {
+					if (Constant.DEBUG) Log.d(TAG, e1.toString());
+				}
+			} else {
+				Log.d(TAG, getContent(child.getData()));
+				webview.loadData(getContent(child.getData()), "text/html", "UTF-8");
+			}
 		} catch (Exception e) {
-			if (Constant.DEBUG) Log.d(TAG, e.toString());
+			Log.d(TAG, e.toString());
 		}
-	}
 
-	private int getScale(int picWidth) {
-		Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		int width = display.getWidth();
-		Double val = new Double(width) / new Double(picWidth);
-		val = val * 100d;
-		return val.intValue();
 	}
 
 	private String getUrl(Data_ data) {
@@ -109,6 +112,18 @@ public class WebViewFragment extends Fragment {
 			}
 
 		} catch (Exception e) {
+		}
+		return "";
+	}
+
+	private String getContent(Data_ data) {
+		if (data == null) {
+			return "";
+		}
+		try {
+			return StringEscapeUtils.unescapeHtml3(child.getData().mediaEmbed.content);
+		} catch (Exception e) {
+			Log.e(TAG, e.toString());
 		}
 		return "";
 	}
